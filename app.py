@@ -8,6 +8,7 @@ from requests.auth import HTTPBasicAuth
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+set_max_retries = os.getenv('SETPASS_RETRIES')
 es_url = os.getenv('ELASTIC_URL')
 es_username = os.getenv('ELASTIC_USERNAME')
 es_password = os.getenv('ELASTIC_PASSWORD')
@@ -18,6 +19,22 @@ set_master_password = os.getenv('SETPASS_master_password')
 
 print("SETPASS_RESET = {}".format(set_passwd))
 print("SETPASS_MASTER = {}".format(set_master))
+
+max_retries = 0
+if set_max_retries != None:
+    try:
+        max_retries = int(set_max_retries)
+    except Exception as e:
+        print('Exception: {}'.format(e))
+        
+        print('\nGet SETPASS_RETRIES [{}], positive integer expected'.format(set_max_retries))
+        sys.exit(0)
+
+    if (max_retries < 1):
+        sys.exit(0)
+else:
+    print('Set MAX RETRIES to default [10]')
+    max_retries = 10
 
 passwords = {}
 
@@ -54,7 +71,6 @@ if (set_passwd == True or set_passwd == 'True' or set_passwd == 'true' or set_pa
 # response = requests.get(url, auth = HTTPBasicAuth('elastic', 'Admin123'), verify='/home/thur/git/espy/ca.crt')
 
     responCode = 404
-    max_retries = 3
     while (responCode == 404) and max_retries > 0:
         endpoint = '/_security/user'
         url = '{}{}'.format(es_url, endpoint)
