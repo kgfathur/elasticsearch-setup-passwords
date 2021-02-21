@@ -1,0 +1,6 @@
+test.sh
+config.conf
+config.env
+__pycache__
+.vscode
+password.conf
